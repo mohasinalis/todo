@@ -1,3 +1,5 @@
 <?php
 
-echo "Connected github account to the vercel account."
+echo "Connected github account to the vercel account.";
+
+?>
