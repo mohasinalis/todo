@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Create your account – Fieldnote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1B2A6B;
+    --ink-soft: #2E3F8F;
+    --paper: #F7F8FC;
+    --surface: #FFFFFF;
+    --sky: #DDE5FF;
+    --signal: #FFC93C;
+    --text: #1A2140;
+    --muted: #5A6485;
+    --line: #D5DAEA;
+    --error: #C2362F;
+    --success: #1E7F55;
+    --focus: #3D5BFF;
+    --radius-lg: 22px;
+    --radius-sm: 10px;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #0F1840;
+      --ink-soft: #24337A;
+      --paper: #0D1126;
+      --surface: #151B38;
+      --sky: #222C5C;
+      --signal: #FFCF52;
+      --text: #E8EBF7;
+      --muted: #A3ABCB;
+      --line: #2C3666;
+      --error: #FF7A72;
+      --success: #4FD39A;
+      --focus: #8CA0FF;
+      color-scheme: dark;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--text);
+    background: var(--paper);
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  }
+
+  .shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(300px, 420px) 1fr;
+  }
+
+  /* ---------- Side panel ---------- */
+  .panel {
+    background: var(--ink);
+    color: #F2F4FF;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::after {
+    /* ruled-notebook texture: the brand's one visual idea */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(255,255,255,.06) 31px 32px);
+    pointer-events: none;
+  }
+  .panel > * { position: relative; z-index: 1; }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--display); font-weight: 700; font-size: 1.35rem;
+  }
+  .brand-mark {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--signal); color: var(--ink);
+    display: grid; place-items: center; font-weight: 800;
+    transform: rotate(-6deg);
+  }
+  .panel h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.2rem, 3.6vw, 3.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+  }
+  .panel p.lede { margin: 0; color: #C5CCEE; max-width: 32ch; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .steps li {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 0; color: #9EA8D8; transition: color .25s;
+  }
+  .steps .num {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: grid; place-items: center;
+    font-weight: 600; font-size: .9rem; flex-shrink: 0;
+    transition: background .25s, color .25s, border-color .25s;
+  }
+  .steps li.active { color: #fff; }
+  .steps li.active .num { background: var(--signal); border-color: var(--signal); color: var(--ink); }
+  .steps li.done { color: #D8DEFF; }
+  .steps li.done .num { background: rgba(255,255,255,.12); border-color: transparent; }
+  .steps .step-title { font-weight: 600; display: block; }
+  .steps .step-sub { font-size: .85rem; opacity: .8; }
+
+  .panel-foot { margin-top: auto; font-size: .9rem; color: #AEB7E2; }
+  .panel-foot strong { color: #fff; font-weight: 600; }
+
+  /* ---------- Form area ---------- */
+  main {
+    padding: 56px clamp(20px, 6vw, 88px);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .form-wrap { width: 100%; max-width: 620px; margin: 0 auto; }
+
+  .progress { height: 6px; background: var(--sky); border-radius: 99px; overflow: hidden; margin-bottom: 36px; }
+  .progress span { display: block; height: 100%; width: 33.33%; background: var(--ink-soft); border-radius: inherit; transition: width .45s cubic-bezier(.2,.8,.2,1); }
+  @media (prefers-color-scheme: dark) { .progress span { background: var(--signal); } }
+
+  .step-head h2 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(1.6rem, 2.6vw, 2rem); letter-spacing: -0.01em;
+    margin: 0 0 6px;
+  }
+  .step-head p { margin: 0 0 32px; color: var(--muted); }
+
+  fieldset { border: 0; padding: 0; margin: 0; }
+  .step { display: none; }
+  .step.active { display: block; animation: enter .35s ease both; }
+  @keyframes enter { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 18px; }
+  .full { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field > label, .group-label { font-weight: 600; font-size: .95rem; }
+  .optional { font-weight: 400; color: var(--muted); font-size: .85rem; }
+
+  input[type="text"], input[type="email"], input[type="tel"], input[type="password"],
+  input[type="date"], input[type="url"], select, textarea {
+    width: 100%;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  textarea { resize: vertical; min-height: 96px; }
+  select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 20px) 52%, calc(100% - 14px) 52%; background-size: 6px 6px; background-repeat: no-repeat; padding-right: 40px; }
+  input:hover, select:hover, textarea:hover { border-color: var(--muted); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: none; border-color: var(--focus);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus) 22%, transparent);
+  }
+  .field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--error); }
+  .error-msg { color: var(--error); font-size: .85rem; min-height: 0; display: none; }
+  .field.invalid .error-msg { display: block; }
+  .hint { color: var(--muted); font-size: .85rem; }
+
+  .input-affix { position: relative; }
+  .input-affix input { padding-right: 76px; }
+  .toggle-pw {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    border: 0; background: var(--sky); color: var(--text);
+    font: 600 .8rem var(--body); padding: 7px 10px; border-radius: 7px; cursor: pointer;
+  }
+  .toggle-pw:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .phone { display: grid; grid-template-columns: 110px 1fr; gap: 8px; }
+
+  /* Password strength */
+  .strength { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 2px; }
+  .strength i { height: 5px; border-radius: 9px; background: var(--line); transition: background .25s; }
+  .strength[data-level="1"] i:nth-child(-n+1) { background: var(--error); }
+  .strength[data-level="2"] i:nth-child(-n+2) { background: #E08A1E; }
+  .strength[data-level="3"] i:nth-child(-n+3) { background: #7FA82B; }
+  .strength[data-level="4"] i { background: var(--success); }
+  .rules { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .82rem; color: var(--muted); }
+  .rules li::before { content: "○ "; }
+  .rules li.ok { color: var(--success); }
+  .rules li.ok::before { content: "● "; }
+
+  /* Avatar */
+  .avatar-row { display: flex; align-items: center; gap: 18px; }
+  .avatar {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: var(--sky); color: var(--ink-soft);
+    display: grid; place-items: center; overflow: hidden;
+    font-family: var(--display); font-weight: 700; font-size: 1.6rem;
+    border: 2px dashed var(--line);
+  }
+  @media (prefers-color-scheme: dark) { .avatar { color: var(--signal); } }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .file-btn {
+    display: inline-block; cursor: pointer; font-weight: 600;
+    border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 9px 14px; background: var(--surface);
+  }
+  .file-btn:hover { border-color: var(--muted); }
+  #avatar:focus-visible + .file-btn { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Segmented radio + chips */
+  .segmented { display: flex; flex-wrap: wrap; gap: 8px; }
+  .segmented label, .chips label { cursor: pointer; }
+  .segmented input, .chips input { position: absolute; opacity: 0; pointer-events: none; }
+  .segmented span, .chips span {
+    display: inline-block; padding: 9px 16px; border-radius: 99px;
+    border: 1.5px solid var(--line); background: var(--surface);
+    font-weight: 500; font-size: .93rem;
+    transition: background .2s, border-color .2s, color .2s;
+  }
+  .segmented input:checked + span, .chips input:checked + span {
+    background: var(--ink-soft); border-color: var(--ink-soft); color: #fff;
+  }
+  .segmented input:focus-visible + span, .chips input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* Switches */
+  .switch-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .switch-row:last-child { border-bottom: 0; }
+  .switch-row strong { display: block; font-weight: 600; }
+  .switch-row small { color: var(--muted); font-size: .86rem; }
+  .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 100%; height: 100%; margin: 0; position: absolute; cursor: pointer; z-index: 1; }
+  .switch .track { position: absolute; inset: 0; background: var(--line); border-radius: 99px; transition: background .2s; }
+  .switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+  .switch input:checked + .track { background: var(--success); }
+  .switch input:checked + .track::after { transform: translateX(20px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; }
+  .check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--ink-soft); flex-shrink: 0; }
+  .check a { color: var(--focus); }
+
+  .counter { align-self: flex-end; font-size: .8rem; color: var(--muted); }
+
+  /* Actions */
+  .actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 36px; }
+  .btn {
+    font: 600 1rem var(--body); cursor: pointer; border-radius: 12px;
+    padding: 13px 24px; border: 1.5px solid transparent;
+    transition: transform .15s, background .2s, border-color .2s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .btn-primary { background: var(--ink-soft); color: #fff; }
+  .btn-primary:hover { background: var(--ink); }
+  @media (prefers-color-scheme: dark) {
+    .btn-primary { background: var(--signal); color: #0F1840; }
+    .btn-primary:hover { background: #FFDA7A; }
+  }
+  .btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+  .btn-ghost:hover { border-color: var(--muted); }
+  .btn[hidden] { display: none; }
+  .btn[disabled] { opacity: .6; cursor: progress; }
+
+  .signin { text-align: center; margin-top: 28px; color: var(--muted); font-size: .95rem; }
+  .signin a { color: var(--focus); font-weight: 600; }
+
+  /* Review summary */
+  .summary { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 6px 18px; margin-top: 8px; }
+  .summary dl { margin: 0; display: grid; grid-template-columns: 140px 1fr; }
+  .summary dt, .summary dd { padding: 9px 0; border-bottom: 1px solid var(--line); margin: 0; font-size: .93rem; }
+  .summary dt { color: var(--muted); }
+  .summary dd { word-break: break-word; }
+  .summary dt:last-of-type, .summary dd:last-of-type { border-bottom: 0; }
+
+  /* Success */
+  .success { display: none; text-align: center; padding: 40px 0; }
+  .success.show { display: block; animation: enter .4s ease both; }
+  .success .tick {
+    width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 24px;
+    background: var(--signal); display: grid; place-items: center;
+  }
+  .success .tick svg { width: 40px; height: 40px; stroke: #1B2A6B; stroke-width: 3.5; fill: none; stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .5s .2s ease forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .success h2 { font-family: var(--display); font-size: 2rem; margin: 0 0 8px; }
+  .success p { color: var(--muted); margin: 0 auto 28px; max-width: 42ch; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .panel { padding: 28px 22px; gap: 22px; }
+    .panel h1 { font-size: 1.9rem; }
+    .steps { grid-template-columns: repeat(3, 1fr); }
+    .steps li { flex-direction: column; align-items: flex-start; gap: 6px; padding: 0; }
+    .steps .step-sub, .panel-foot { display: none; }
+    main { padding: 32px 20px 48px; }
+  }
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; }
+    .summary dl { grid-template-columns: 1fr; }
+    .summary dt { border-bottom: 0; padding-bottom: 0; }
+    .actions { flex-direction: column-reverse; align-items: stretch; }
+    .btn { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .success .tick svg { stroke-dashoffset: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="panel" aria-label="Registration progress">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">F</span> Fieldnote</div>
+
+    <div>
+      <h1>Start your notebook.</h1>
+      <p class="lede">One account for your notes, projects and team. Setup takes about two minutes.</p>
+    </div>
+
+    <ol class="steps" id="stepList">
+      <li class="active"><span class="num">1</span><div><span class="step-title">Account</span><span class="step-sub">Email and password</span></div></li>
+      <li><span class="num">2</span><div><span class="step-title">Profile</span><span class="step-sub">How others see you</span></div></li>
+      <li><span class="num">3</span><div><span class="step-title">Review</span><span class="step-sub">Preferences and confirm</span></div></li>
+    </ol>
+
+    <p class="panel-foot">Free for teams up to 5. <strong>No card needed.</strong></p>
+  </aside>
+
+  <main>
+    <div class="form-wrap">
+      <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+
+      <form id="regForm" novalidate>
+        <!-- STEP 1 -->
+        <fieldset class="step active" data-step="1">
+          <div class="step-head">
+            <h2>Create your account</h2>
+            <p>You’ll use this email to sign in.</p>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input id="firstName" name="firstName" type="text" autocomplete="given-name" required>
+              <span class="error-msg">Enter your first name.</span>
+            </div>
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input id="lastName" name="lastName" type="text" autocomplete="family-name" required>
+              <span class="error-msg">Enter your last name.</span>
+            </div>
+            <div class="field full">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+              <span class="error-msg">Enter a valid email, like name@company.com.</span>
+            </div>
+            <div class="field full">
+              <label for="password">Password</label>
+              <div class="input-affix">
+                <input id="password" name="password" type="password" autocomplete="new-password" required aria-describedby="pwRules">
+                <button type="button" class="toggle-pw" data-target="password" aria-label="Show password">Show</button>
+              </div>
+              <div class="strength" id="strength" data-level="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <ul class="rules" id="pwRules">
+                <li data-rule="len">8+ characters</li>
+                <li data-rule="case">Upper and lower case</li>
+                <li data-rule="num">A number</li>
+                <li data-rule="sym">A symbol</li>
+              </ul>
+              <span class="error-msg">Use at least 8 characters with a number and a capital letter.</span>
+            </div>
+            <div class="field full">
+              <label for="confirm">Confirm password</label>
+              <div class="input-affix">
+                <input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+                <button type="button" class="toggle-pw" data-target="confirm" aria-label="Show password">Show</button>
+              </div>
+              <span class="error-msg">Passwords don’t match.</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- STEP 2 -->
+        <fieldset class="step" data-step="2">
+          <div class="step-head">
+            <h2>Set up your profile</h2>
+            <p>Teammates see this on shared notes.</p>
+          </div>
+          <div class="grid">
+            <div class="field full">
+              <span class="group-label">Profile photo <span class="optional">(optional)</span></span>
+              <div class="avatar-row">
+                <div class="avatar" id="avatarPreview" aria-hidden="true">?</div>
+                <div>
+                  <input type="file" id="avatar" accept="image/*" class="sr-only">
+                  <label for="avatar" class="file-btn">Upload photo</label>
+                  <div class="hint">JPG or PNG, up to 2 MB.</div>
+                </div>
+              </div>
+              <span class="error-msg" id="avatarErr">Choose an image under 2 MB.</span>
+            </div>
+            <div class="field full">
+              <label for="phone">Mobile number</label>
+              <div class="phone">
+                <select id="code" aria-label="Country code">
+                  <option value="+91">🇮🇳 +91</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+971">🇦🇪 +971</option>
+                  <option value="+61">🇦🇺 +61</option>
+                </select>
+                <input id="phone" name="phone" type="tel" autocomplete="tel-national" inputmode="numeric" placeholder="98765 43210" required>
+              </div>
+              <span class="error-msg">Enter a phone number with 7–12 digits.</span>
+            </div>
+            <div class="field">
+              <label for="dob">Date of birth</label>
+              <input id="dob" name="dob" type="date" required>
+              <span class="error-msg">You need to be at least 16.</span>
+            </div>
+            <div class="field">
+              <label for="country">Country</label>
+              <select id="country" name="country" required>
+                <option value="">Select country</option>
+                <option>India</option><option>United States</option><option>United Kingdom</option>
+                <option>United Arab Emirates</option><option>Australia</option><option>Canada</option><option>Germany</option>
+              </select>
+              <span class="error-msg">Choose your country.</span>
+            </div>
+            <div class="field full">
+              <span class="group-label" id="roleLabel">Your role</span>
+              <div class="segmented" role="radiogroup" aria-labelledby="roleLabel">
+                <label><input type="radio" name="role" value="Developer" checked><span>Developer</span></label>
+                <label><input type="radio" name="role" value="Designer"><span>Designer</span></label>
+                <label><input type="radio" name="role" value="Manager"><span>Manager</span></label>
+                <label><input type="radio" name="role" value="Student"><span>Student</span></label>
+                <label><input type="radio" name="role" value="Other"><span>Other</span></label>
+              </div>
+            </div>
+            <div class="field full">
+              <label for="bio">Short bio <span class="optional">(optional)</span></label>
+              <textarea id="bio" name="bio" maxlength="160" placeholder="What do you work on?"></textarea>
+              <span class="counter" id="bioCount">0 / 160</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- STEP 3 -->
+        <fieldset class="step" data-step="3">
+          <div class="step-head">
+            <h2>Almost done</h2>
+            <p>Pick what you’ll use most, then check your details.</p>
+          </div>
+          <div class="grid">
+            <div class="field full">
+              <span class="group-label" id="intLabel">What will you use Fieldnote for?</span>
+              <div class="chips" role="group" aria-labelledby="intLabel">
+                <label><input type="checkbox" name="interests" value="Meeting notes"><span>Meeting notes</span></label>
+                <label><input type="checkbox" name="interests" value="Project planning"><span>Project planning</span></label>
+                <label><input type="checkbox" name="interests" value="Documentation"><span>Documentation</span></label>
+                <label><input type="checkbox" name="interests" value="Research"><span>Research</span></label>
+                <label><input type="checkbox" name="interests" value="Personal journal"><span>Personal journal</span></label>
+              </div>
+            </div>
+            <div class="field full">
+              <div class="switch-row">
+                <div><strong>Weekly summary email</strong><small>A digest of what changed in your notebooks.</small></div>
+                <label class="switch"><input type="checkbox" id="digest" checked aria-label="Weekly summary email"><span class="track"></span></label>
+              </div>
+              <div class="switch-row">
+                <div><strong>Product updates</strong><small>New features, about once a month.</small></div>
+                <label class="switch"><input type="checkbox" id="updates" aria-label="Product updates"><span class="track"></span></label>
+              </div>
+            </div>
+            <div class="field full">
+              <span class="group-label">Your details</span>
+              <div class="summary"><dl id="summary"></dl></div>
+            </div>
+            <div class="field full">
+              <label class="check"><input type="checkbox" id="terms" required> <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span></label>
+              <span class="error-msg">Accept the terms to create your account.</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="actions" id="actions">
+          <button type="button" class="btn btn-ghost" id="backBtn" hidden>Back</button>
+          <button type="submit" class="btn btn-primary" id="nextBtn">Continue</button>
+        </div>
+      </form>
+
+      <section class="success" id="success" aria-live="polite">
+        <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2 id="welcome">Account created</h2>
+        <p>We sent a confirmation link to <strong id="sentTo"></strong>. Open it to activate your account.</p>
+        <button type="button" class="btn btn-ghost" id="resetBtn">Register another account</button>
+      </section>
+
+      <p class="signin" id="signin">Already have an account? <a href="#">Sign in</a></p>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const form = document.getElementById('regForm');
+  const steps = [...form.querySelectorAll('.step')];
+  const stepItems = [...document.querySelectorAll('#stepList li')];
+  const bar = document.getElementById('bar');
+  const backBtn = document.getElementById('backBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const $ = id => document.getElementById(id);
+  let current = 0;
+
+  const setError = (input, bad) => {
+    const field = input.closest('.field');
+    field.classList.toggle('invalid', bad);
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    return !bad;
+  };
+
+  // Password rules
+  const pwChecks = {
+    len: v => v.length >= 8,
+    case: v => /[a-z]/.test(v) && /[A-Z]/.test(v),
+    num: v => /\d/.test(v),
+    sym: v => /[^A-Za-z0-9]/.test(v)
+  };
+  $('password').addEventListener('input', e => {
+    const v = e.target.value;
+    let score = 0;
+    document.querySelectorAll('#pwRules li').forEach(li => {
+      const ok = pwChecks[li.dataset.rule](v);
+      li.classList.toggle('ok', ok);
+      if (ok) score++;
+    });
+    $('strength').dataset.level = v ? score : 0;
+  });
+
+  document.querySelectorAll('.toggle-pw').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = $(btn.dataset.target);
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.textContent = show ? 'Hide' : 'Show';
+      btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  });
+
+  // Avatar preview
+  const preview = $('avatarPreview');
+  const updateInitials = () => {
+    if (preview.querySelector('img')) return;
+    const i = ($('firstName').value[0] || '') + ($('lastName').value[0] || '');
+    preview.textContent = i.toUpperCase() || '?';
+  };
+  $('avatar').addEventListener('change', e => {
+    const file = e.target.files[0];
+    const field = e.target.closest('.field');
+    if (!file) return;
+    if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
+      field.classList.add('invalid'); e.target.value = ''; return;
+    }
+    field.classList.remove('invalid');
+    const reader = new FileReader();
+    reader.onload = () => { preview.innerHTML = ''; const img = new Image(); img.src = reader.result; img.alt = ''; preview.appendChild(img); };
+    reader.readAsDataURL(file);
+  });
+
+  $('bio').addEventListener('input', e => { $('bioCount').textContent = `${e.target.value.length} / 160`; });
+
+  // Validation per step
+  const validators = {
+    1: () => {
+      const email = $('email'), pw = $('password'), cf = $('confirm');
+      const okPw = pwChecks.len(pw.value) && /[A-Z]/.test(pw.value) && /\d/.test(pw.value);
+      return [
+        setError($('firstName'), !$('firstName').value.trim()),
+        setError($('lastName'), !$('lastName').value.trim()),
+        setError(email, !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())),
+        setError(pw, !okPw),
+        setError(cf, !cf.value || cf.value !== pw.value)
+      ].every(Boolean);
+    },
+    2: () => {
+      const digits = $('phone').value.replace(/\D/g, '');
+      const dob = $('dob').value;
+      let ageOk = false;
+      if (dob) {
+        const d = new Date(dob), now = new Date();
+        let age = now.getFullYear() - d.getFullYear();
+        if (now < new Date(now.getFullYear(), d.getMonth(), d.getDate())) age--;
+        ageOk = age >= 16 && age < 120;
+      }
+      return [
+        setError($('phone'), digits.length < 7 || digits.length > 12),
+        setError($('dob'), !ageOk),
+        setError($('country'), !$('country').value)
+      ].every(Boolean);
+    },
+    3: () => setError($('terms'), !$('terms').checked)
+  };
+
+  // Live re-validation once a field has been flagged
+  form.addEventListener('input', e => {
+    if (e.target.closest('.field.invalid')) validators[current + 1]();
+  });
+
+  const buildSummary = () => {
+    const role = form.querySelector('input[name="role"]:checked').value;
+    const rows = [
+      ['Name', `${$('firstName').value.trim()} ${$('lastName').value.trim()}`],
+      ['Email', $('email').value.trim()],
+      ['Mobile', `${$('code').value} ${$('phone').value.trim()}`],
+      ['Country', $('country').value],
+      ['Role', role]
+    ];
+    const dl = $('summary');
+    dl.innerHTML = '';
+    rows.forEach(([k, v]) => {
+      const dt = document.createElement('dt'); dt.textContent = k;
+      const dd = document.createElement('dd'); dd.textContent = v;
+      dl.append(dt, dd);
+    });
+  };
+
+  const show = i => {
+    steps.forEach((s, n) => s.classList.toggle('active', n === i));
+    stepItems.forEach((li, n) => {
+      li.classList.toggle('active', n === i);
+      li.classList.toggle('done', n < i);
+      if (n === i) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+    });
+    bar.style.width = `${((i + 1) / steps.length) * 100}%`;
+    backBtn.hidden = i === 0;
+    nextBtn.textContent = i === steps.length - 1 ? 'Create account' : 'Continue';
+    if (i === 1) updateInitials();
+    if (i === 2) buildSummary();
+    current = i;
+    const first = steps[i].querySelector('input, select, textarea');
+    if (first && i > 0) first.focus({ preventScroll: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  backBtn.addEventListener('click', () => show(current - 1));
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validators[current + 1]()) {
+      const bad = steps[current].querySelector('.field.invalid input, .field.invalid select');
+      if (bad) bad.focus();
+      return;
+    }
+    if (current < steps.length - 1) { show(current + 1); return; }
+
+    // Demo submit: no data leaves the page
+    nextBtn.disabled = true;
+    nextBtn.textContent = 'Creating account…';
+    setTimeout(() => {
+      $('sentTo').textContent = $('email').value.trim();
+      $('welcome').textContent = `Welcome, ${$('firstName').value.trim()}`;
+      form.hidden = true;
+      $('signin').hidden = true;
+      document.querySelector('.progress').hidden = true;
+      stepItems.forEach(li => { li.classList.remove('active'); li.classList.add('done'); });
+      $('success').classList.add('show');
+      $('resetBtn').focus();
+    }, 1100);
+  });
+
+  $('resetBtn').addEventListener('click', () => {
+    form.reset();
+    form.querySelectorAll('.invalid').forEach(f => f.classList.remove('invalid'));
+    preview.innerHTML = '?';
+    $('strength').dataset.level = 0;
+    document.querySelectorAll('#pwRules li').forEach(li => li.classList.remove('ok'));
+    $('bioCount').textContent = '0 / 160';
+    nextBtn.disabled = false;
+    form.hidden = false;
+    $('signin').hidden = false;
+    document.querySelector('.progress').hidden = false;
+    $('success').classList.remove('show');
+    show(0);
+    $('firstName').focus();
+  });
+})();
+</script>
+</body>
+</html>
